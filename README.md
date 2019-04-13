@@ -16,3 +16,11 @@ programming language. The instructor recommends students to choose the Python
 programming language or Java since there are plenty of useful code snippets out 
 there to help implement the required functionalities. If the student decides to submit 
 the optional part, all the required stuff to execute the program must be provided.
+
+## How to run
+
+- create and activate a new virtualenv
+- run pip3 install -r requirements.txt
+- run python3 main.py
+
+
