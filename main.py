@@ -8,11 +8,10 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from textblob import Word
 
-#nltk.download('wordnet')
+# nltk.download('wordnet')
 
 
 PREFERENCES = ["business", "entertainment", "politics", "sport", "tech"]
-
 
 
 def clean_str(string):
@@ -33,7 +32,7 @@ def clean_str(string):
     string = re.sub(r"\?", "", string)
     string = re.sub(r"'", "", string)
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
-    string = re.sub(r"[0-9]\w+|[0-9]","", string)
+    string = re.sub(r"[0-9]\w+|[0-9]", "", string)
     string = re.sub(r"\s{2,}", " ", string)
 
     return string.strip().lower()
@@ -69,12 +68,14 @@ def assign_preferences(users):
         users_with_preferences[user] = preferences
     return users_with_preferences
 
+
 def predict_doc_type(doc, vect, model):
     doc_cleaned = clean_str(doc)
     corpus = []
     corpus.append(doc_cleaned)
     test_vect = vect.transform(corpus)
     return model.predict(test_vect)[0]
+
 
 # Testing results
 def test(vect, model):
@@ -84,12 +85,13 @@ def test(vect, model):
     print("--------------------------------------------------------")
     print("Users preferences:")
     for user in users_with_preferences:
-        print(user," -> ",users_with_preferences[user])
+        print(user, " -> ", users_with_preferences[user])
 
     while True:
         try:
             print("--------------------------------------------------------")
-            test_corpus = input("Paste here an article without newline characters (\\n) (Press 'q' to quit or 'r' to reassign the preferences): ")
+            test_corpus = input(
+                "Paste here an article without newline characters (\\n) (Press 'q' to quit or 'r' to reassign the preferences): ")
         except ValueError:
             continue
         if test_corpus == "q":
@@ -113,25 +115,23 @@ def test(vect, model):
 
 
 # RUNTIME
-dataset = pd.read_csv('dataset.csv', encoding = "ISO-8859-1")
+dataset = pd.read_csv('dataset.csv', encoding="ISO-8859-1")
 
 X_train, X_test, y_train, y_test, vect = prepare_dataset(dataset)
 
 X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.50, random_state=42)
 
-print("Train set:"+ str(X_train.shape))
-print("Validation set:"+ str(X_val.shape))
-print("Test set:"+ str(X_test.shape))
-
+print("Train set:" + str(X_train.shape))
+print("Validation set:" + str(X_val.shape))
+print("Test set:" + str(X_test.shape))
 
 # Random Forest
 print("RANDOM FOREST")
-modelRF = RandomForestClassifier(n_estimators=300, max_depth=150,n_jobs=1)
+modelRF = RandomForestClassifier(n_estimators=300, max_depth=150, n_jobs=1)
 modelRF.fit(X_train, y_train)
 y_predRF = modelRF.predict(X_val)
-accRF = classification_report(y_val,y_predRF)
+accRF = classification_report(y_val, y_predRF)
 print(accRF)
-
 
 # classifiers = [
 #     KNeighborsClassifier(3),
@@ -154,13 +154,4 @@ accRF = accuracy_score(y_test,y_predRF)
 print("\nAccuracy: ",accRF)
 """
 
-
-
 test(vect, modelRF)
-
-
-
-
-
-
-
