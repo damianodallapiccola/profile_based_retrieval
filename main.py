@@ -3,8 +3,9 @@ import re
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
 from textblob import Word
 
@@ -125,13 +126,29 @@ print("Train set:" + str(X_train.shape))
 print("Validation set:" + str(X_val.shape))
 print("Test set:" + str(X_test.shape))
 
+print("------ MODELS TRAINING ------")
+#"""
 # Random Forest
 print("RANDOM FOREST")
 modelRF = RandomForestClassifier(n_estimators=300, max_depth=150, n_jobs=1)
 modelRF.fit(X_train, y_train)
 y_predRF = modelRF.predict(X_val)
-accRF = classification_report(y_val, y_predRF)
-print(accRF)
+resultRF = classification_report(y_val, y_predRF)
+accRF = accuracy_score(y_val, y_predRF)
+print(resultRF)
+print("\nAccuracy: ",accRF)
+#"""
+
+# SVM
+print("SVM")
+modelSVC = SVC(kernel='linear', gamma='auto')
+modelSVC.fit(X_train, y_train)
+y_predSVC = modelSVC.predict(X_val)
+resultSCV = classification_report(y_val, y_predSVC)
+accSVC = accuracy_score(y_val, y_predSVC)
+print(resultSCV)
+print("\nAccuracy: ", accSVC)
+
 
 # classifiers = [
 #     KNeighborsClassifier(3),
@@ -144,14 +161,20 @@ print(accRF)
 #     QuadraticDiscriminantAnalysis()]
 
 
-"""
-# Random Forest
-print("RANDOM FOREST")
-modelRF = RandomForestClassifier(n_estimators=300, max_depth=150,n_jobs=1)
-modelRF.fit(X_train, y_train)
+
+
+# TESTING THE MODELS
+
+print("------ MODELS TEST (accuracy) ------")
+#"""
 y_predRF = modelRF.predict(X_test)
 accRF = accuracy_score(y_test,y_predRF)
-print("\nAccuracy: ",accRF)
-"""
+print("\nRANDOM FOREST: ", accRF)
+#"""
+y_predSVC = modelSVC.predict(X_test)
+accSVC = accuracy_score(y_test,y_predSVC)
+print("\nSVC: ",accSVC)
 
-test(vect, modelRF)
+test(vect, modelSVC)
+
+
