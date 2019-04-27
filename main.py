@@ -1,20 +1,24 @@
+import random
 import re
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from textblob import Word
 import numpy as np
-from sklearn.model_selection import train_test_split
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, cohen_kappa_score, confusion_matrix
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from textblob import Word
+
+#nltk.download('wordnet')
 
 
-import nltk
-nltk.download('wordnet')
+PREFERENCES = ["business", "entertainment", "politics", "sport", "tech"]
+
+
 
 def clean_str(string):
     """
-    Tokenization/string cleaning for datasets.
-    Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
+    String cleaning for datasets.
+    Taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
     """
     string = re.sub(r"\'s", "", string)
     string = re.sub(r"\'ve", "", string)
@@ -34,49 +38,24 @@ def clean_str(string):
 
     return string.strip().lower()
 
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 
-dataset = pd.read_csv('dataset.csv', encoding = "ISO-8859-1")
+def prepare_dataset(dataset):
+    # devide in features and labels
+    x = dataset['news'].tolist()
+    y = dataset['type'].tolist()
+    print("Processing data...")
+    for i, value in enumerate(x):
+        x[i] = ' '.join([Word(word).lemmatize() for word in clean_str(value).split()])
+    print("Done!")
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.20, random_state=42)
+    vect = TfidfVectorizer(stop_words='english', min_df=2)
 
+    X_train = vect.fit_transform(X_train)
+    y_train = np.array(y_train)
+    X_test = vect.transform(X_test)
+    y_test = np.array(y_test)
+    return X_train, X_test, y_train, y_test, vect
 
-x = dataset['news'].tolist()
-y = dataset['type'].tolist()
-
-for index,value in enumerate(x):
-    print ("processing data:",index)
-    x[index] = ' '.join([Word(word).lemmatize() for word in clean_str(value).split()])
-
-
-vect = TfidfVectorizer(stop_words='english', min_df=2)
-X = vect.fit_transform(x)
-Y = np.array(y)
-
-print ("no of features extracted:",X.shape[1])
-
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
-
-print ("train size:", X_train.shape)
-print ("test size:", X_test.shape)
-
-model = RandomForestClassifier(n_estimators=300, max_depth=150,n_jobs=1)
-model.fit(X_train, y_train)
-
-# y_pred = model.predict(X_test)
-# c_mat = confusion_matrix(y_test,y_pred)
-# kappa = cohen_kappa_score(y_test,y_pred)
-# acc = accuracy_score(y_test,y_pred)
-#
-#
-# print ("Confusion Matrix:\n", c_mat)
-# print ("\nKappa: ",kappa)
-# print ("\nAccuracy: ",acc)
-
-
-import random
-
-PREFERENCES = ["business", "entertainment", "politics", "sport", "tech"]
 
 def assign_preferences(users):
     users_with_preferences = {}
@@ -90,53 +69,95 @@ def assign_preferences(users):
         users_with_preferences[user] = preferences
     return users_with_preferences
 
-def predict_doc_type(doc, vect):
+def predict_doc_type(doc, vect, model):
     doc_cleaned = clean_str(doc)
     corpus = []
     corpus.append(doc_cleaned)
     test_vect = vect.transform(corpus)
     return model.predict(test_vect)[0]
 
+# Testing results
+def test(vect, model):
+    users = ["Maria", "Nacho", "Luca", "Adam", "Tom", "Mike"]
+    users_with_preferences = assign_preferences(users)
 
-users = ["Maria", "Nacho", "Luca", "Adam", "Tom"]
-users_with_preferences = assign_preferences(users)
+    print("--------------------------------------------------------")
+    print("Users preferences:")
+    for user in users_with_preferences:
+        print(user," -> ",users_with_preferences[user])
 
-print("--------------------------------------------------------")
-print("Users preferences:")
-for user in users_with_preferences:
-    print(user," -> ",users_with_preferences[user])
+    while True:
+        try:
+            print("--------------------------------------------------------")
+            test_corpus = input("Paste here an article without newline characters (\\n) (Press 'q' to quit or 'r' to reassign the preferences): ")
+        except ValueError:
+            continue
+        if test_corpus == "q":
+            break
+        if test_corpus == "r":
+            users_with_preferences = assign_preferences(users)
+            print("--------------------------------------------------------")
+            print("Users preferences:")
+            for user in users_with_preferences:
+                print(user, " -> ", users_with_preferences[user])
+            continue
+        else:
 
-# Sport test article
-# test_corpus = "The Lakers said in a statement that Walton and the team had “mutually agreed to part ways," \
-#               "” without elaborating. The news came three days after Magic Johnson, the team’s president of " \
-#               "basketball operations, made the surprise announcement that he was resigning so that he could " \
-#               "devote more time to his various business interests."
+            result = predict_doc_type(test_corpus, vect, model)
+            print("--------------------------------------------------------")
+            print("This article talks about", result.upper(), "and it's addressed to:")
+            for user in users_with_preferences:
+                if result in users_with_preferences[user]:
+                    print(user)
+            continue
 
 
-while True:
-    try:
-        print("--------------------------------------------------------")
-        test_corpus = input("Paste here an article without newline characters (\\n) (Press 'q' to quit or 'r' to reassign the preferences): ")
-    except ValueError:
-        continue
-    if test_corpus == "q":
-        break
-    if test_corpus == "r":
-        users_with_preferences = assign_preferences(users)
-        print("--------------------------------------------------------")
-        print("Users preferences:")
-        for user in users_with_preferences:
-            print(user, " -> ", users_with_preferences[user])
-        continue
-    else:
+# RUNTIME
+dataset = pd.read_csv('dataset.csv', encoding = "ISO-8859-1")
 
-        result = predict_doc_type(test_corpus, vect)
-        print("--------------------------------------------------------")
-        print("This article talks about", result, "and it's addressed to:")
-        for user in users_with_preferences:
-            if result in users_with_preferences[user]:
-                print(user)
-        continue
+X_train, X_test, y_train, y_test, vect = prepare_dataset(dataset)
+
+X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.50, random_state=42)
+
+print("Train set:"+ str(X_train.shape))
+print("Validation set:"+ str(X_val.shape))
+print("Test set:"+ str(X_test.shape))
+
+
+# Random Forest
+print("RANDOM FOREST")
+modelRF = RandomForestClassifier(n_estimators=300, max_depth=150,n_jobs=1)
+modelRF.fit(X_train, y_train)
+y_predRF = modelRF.predict(X_val)
+accRF = classification_report(y_val,y_predRF)
+print(accRF)
+
+
+# classifiers = [
+#     KNeighborsClassifier(3),
+#     SVC(kernel="rbf", C=0.025, probability=True),
+#     NuSVC(probability=True),
+#     AdaBoostClassifier(),
+#     GradientBoostingClassifier(),
+#     GaussianNB(),
+#     LinearDiscriminantAnalysis(),
+#     QuadraticDiscriminantAnalysis()]
+
+
+"""
+# Random Forest
+print("RANDOM FOREST")
+modelRF = RandomForestClassifier(n_estimators=300, max_depth=150,n_jobs=1)
+modelRF.fit(X_train, y_train)
+y_predRF = modelRF.predict(X_test)
+accRF = accuracy_score(y_test,y_predRF)
+print("\nAccuracy: ",accRF)
+"""
+
+
+
+test(vect, modelRF)
+
 
 
 
