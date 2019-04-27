@@ -19,8 +19,12 @@ the optional part, all the required stuff to execute the program must be provide
 
 ## How to run
 
+- go to into the folder of the project
 - create and activate a new virtualenv
-- run pip3 install -r requirements.txt
-- run python3 main.py
+- then run the following commands
 
-
+```
+$ pip3 install -r requirements.txt
+$ python -m textblob.download_corpora
+$ run python3 main.py
+```
