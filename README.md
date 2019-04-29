@@ -26,5 +26,5 @@ the optional part, all the required stuff to execute the program must be provide
 ```
 $ pip3 install -r requirements.txt
 $ python -m textblob.download_corpora
-$ run python3 main.py
+$ python3 main.py
 ```
