@@ -1,10 +1,7 @@
 import pandas as pd
 from data_preparation import prepare_dataset
-from models import eval_model, test_model, train_RF, train_SVC
+from models import eval_model, test_model, train_RF, train_SVC, train_NN
 from demo import run_demo
-
-# nltk.download('wordnet')
-
 
 def main():
     # DATA PREPARATION
@@ -16,19 +13,15 @@ def main():
     print("------------------- MODELS  TRAINING -------------------")
     print("--------------------------------------------------------\n")
 
-    """
-    #CRF
-    modelCRF = train_CRF(X_train, y_train)
-    eval_model(modelCRF, X_val, y_val)
-    """
-
     # Random Forest
     modelRF = train_RF(X_train, y_train)
     eval_model(modelRF, X_val, y_val)
     # SVM
     modelSVC = train_SVC(X_train, y_train)
     eval_model(modelSVC, X_val, y_val)
-
+    #NN
+    modelNN = train_NN(X_train, y_train)
+    eval_model(modelNN, X_val, y_val)
 
 
     # MODELS TESTING
@@ -36,13 +29,12 @@ def main():
     print("-------------- MODELS  TESTING (accuracy) --------------")
     print("--------------------------------------------------------\n")
     print("RANDOM FOREST:     ", test_model(modelRF, X_test, y_test))
-    print("SVC:               ",test_model(modelSVC, X_test, y_test))
-
+    print("SVC:               ", test_model(modelSVC, X_test, y_test))
+    print("NEURAL NETWORK:    ", test_model(modelNN, X_test, y_test))
 
 
     # RUN THE DEMO
-    run_demo(vect, modelSVC)
-
+    run_demo(vect, modelNN)
 
 
 if __name__ == '__main__':

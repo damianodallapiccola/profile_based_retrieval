@@ -4,11 +4,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from textblob import Word
 
+
 def clean_string(string):
-    """
-    String cleaning for datasets.
-    Taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
-    """
+
     string = re.sub(r"\'s", "", string)
     string = re.sub(r"\'ve", "", string)
     string = re.sub(r"n\'t", "", string)
@@ -29,15 +27,17 @@ def clean_string(string):
 
 
 def prepare_dataset(dataset):
-    # devide in features and labels
+    # divide in features and labels
     x = dataset['news'].tolist()
     y = dataset['type'].tolist()
     print("\n--------------------------------------------------------")
     print("------------------- DATA PREPARATION -------------------")
     print("--------------------------------------------------------\n")
-    print("Cleaning and tokenization...", end = '')
+    print("Tokenization & lemmatization", end='', flush=True)
     for i, value in enumerate(x):
         x[i] = ' '.join([Word(word).lemmatize() for word in clean_string(value).split()])
+        if(i%100==0):
+            print('.', end='', flush=True)
     print("DONE!\n")
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.20, random_state=42)
     vect = TfidfVectorizer(stop_words='english', min_df=2)

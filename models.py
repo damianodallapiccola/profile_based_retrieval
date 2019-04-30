@@ -1,29 +1,29 @@
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, accuracy_score
-# import sklearn_crfsuite
 
-"""
-def train_CRF(X_train, y_train):
-    print("-------------------")
-    print("------- CRF -------")
-    print("-------------------")
-    model = sklearn_crfsuite.CRF(
-    algorithm='lbfgs',
-    c1=0.1,
-    c2=0.1,
-    max_iterations=100,
-    all_possible_transitions=True
-    )
-    model.fit(X_train, y_train)
-    return model
-"""
 def train_RF(X_train, y_train):
     print("-------------------")
     print("-- RANDOM FOREST --")
     print("-------------------")
     model = RandomForestClassifier(n_estimators=300, max_depth=150, n_jobs=1)
+    model.fit(X_train, y_train)
+    return model
+
+def train_NN(X_train, y_train):
+    print("-------------------")
+    print("- NEURAL  NETWORK -")
+    print("-------------------")
+    model = MLPClassifier(activation='relu', alpha=1e-05, batch_size='auto',
+              beta_1=0.9, beta_2=0.999, early_stopping=True,
+              epsilon=1e-08, hidden_layer_sizes=(128, 64),
+              learning_rate='constant', learning_rate_init=0.001,
+              max_iter=400, momentum=0.9, n_iter_no_change=10,
+              nesterovs_momentum=True, power_t=0.5, random_state=1,
+              shuffle=True, solver='lbfgs', tol=0.0001,
+              validation_fraction=0.1, verbose=False, warm_start=False)
     model.fit(X_train, y_train)
     return model
 
@@ -49,16 +49,3 @@ def test_model(model, X_test, y_test):
     return acc
 
 
-
-
-
-
-# classifiers = [
-#     KNeighborsClassifier(3),
-#     SVC(kernel="rbf", C=0.025, probability=True),
-#     NuSVC(probability=True),
-#     AdaBoostClassifier(),
-#     GradientBoostingClassifier(),
-#     GaussianNB(),
-#     LinearDiscriminantAnalysis(),
- #     QuadraticDiscriminantAnalysis()]
