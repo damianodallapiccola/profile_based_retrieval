@@ -35,7 +35,7 @@ def prepare_dataset(dataset):
     print("\n--------------------------------------------------------")
     print("------------------- DATA PREPARATION -------------------")
     print("--------------------------------------------------------\n")
-    print("Processing data...", end = '')
+    print("Cleaning and tokenization...", end = '')
     for i, value in enumerate(x):
         x[i] = ' '.join([Word(word).lemmatize() for word in clean_string(value).split()])
     print("DONE!\n")

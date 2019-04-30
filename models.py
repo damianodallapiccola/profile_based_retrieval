@@ -2,9 +2,23 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, accuracy_score
+# import sklearn_crfsuite
 
-
-
+"""
+def train_CRF(X_train, y_train):
+    print("-------------------")
+    print("------- CRF -------")
+    print("-------------------")
+    model = sklearn_crfsuite.CRF(
+    algorithm='lbfgs',
+    c1=0.1,
+    c2=0.1,
+    max_iterations=100,
+    all_possible_transitions=True
+    )
+    model.fit(X_train, y_train)
+    return model
+"""
 def train_RF(X_train, y_train):
     print("-------------------")
     print("-- RANDOM FOREST --")

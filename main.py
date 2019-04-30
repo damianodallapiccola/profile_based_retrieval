@@ -16,12 +16,20 @@ def main():
     print("------------------- MODELS  TRAINING -------------------")
     print("--------------------------------------------------------\n")
 
+    """
+    #CRF
+    modelCRF = train_CRF(X_train, y_train)
+    eval_model(modelCRF, X_val, y_val)
+    """
+
     # Random Forest
     modelRF = train_RF(X_train, y_train)
     eval_model(modelRF, X_val, y_val)
     # SVM
     modelSVC = train_SVC(X_train, y_train)
     eval_model(modelSVC, X_val, y_val)
+
+
 
     # MODELS TESTING
     print("\n--------------------------------------------------------")
@@ -30,6 +38,9 @@ def main():
     print("RANDOM FOREST:     ", test_model(modelRF, X_test, y_test))
     print("SVC:               ",test_model(modelSVC, X_test, y_test))
 
+
+
+    # RUN THE DEMO
     run_demo(vect, modelSVC)
 
 
